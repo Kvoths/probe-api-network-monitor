@@ -4,8 +4,12 @@
   "description": "API alojada en las sondas que recoge información del tráfico en la red",
   "main": "app.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "nodemon app.js"
   },
   "author": "Carlos López Sanchís",
-  "license": "ISC"
+  "license": "ISC",
+  "dependencies": {
+    "mqtt": "^2.18.8"
+  }
 }
