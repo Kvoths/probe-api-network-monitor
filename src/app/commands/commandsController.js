@@ -9,18 +9,26 @@ require('./result');
 let Result = mongoose.model('Result');
 //var exports = module.exports;
 exports.processMessage = function (topic, message) {
-    let splitedTopic = topic.split('/');
-    if (splitedTopic[2] == 'command' && splitedTopic[3] !== undefined) {
-        //Destroy command
-        if (message == 'Off' && cronJobs[splitedTopic[3]] !== undefined) {
-            cronJobs[splitedTopic[3]].destroy();
-        } else {
+    try {    
+        let splitedTopic = topic.split('/');
+        if (splitedTopic[2] == 'command' && splitedTopic[3] !== undefined) {
             let command = JSON.parse(message);
+            console.log(command.active);
             command._id = splitedTopic[3];
-            createCron(command);
-        }
-        //Set command
+            //Destroy command
+            if (!command.active && cronJobs[splitedTopic[3]] !== undefined) {
+                console.log('Deleting: ' + splitedTopic[3]);
+                cronJobs[splitedTopic[3]].destroy();
+                console.log('Deleted.');
+            } else if (command.active) {
+                console.log('saludos');
+                createCron(command);
+            }
+            //Set command
 
+        }
+    } catch (e) {
+        console.log(e);
     }
 }
 
@@ -41,7 +49,7 @@ createCron = function (command) {
     let dayWeek = (command.time.dayWeek) ? command.time.dayWeek : '*';
     let cronString = minute + ' ' + hour + ' ' + dayMonth + ' ' + month + ' ' + dayWeek;  
 
-    cron.schedule(cronString, () => {
+    cronJobs[command._id] = cron.schedule(cronString, () => {
         this.execAuto(command);
     });
 }
