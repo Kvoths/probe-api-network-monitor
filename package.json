@@ -11,6 +11,8 @@
   "license": "ISC",
   "dependencies": {
     "dotenv": "^8.0.0",
-    "mqtt": "^2.18.8"
+    "mongoose": "^5.5.7",
+    "mqtt": "^2.18.8",
+    "node-cron": "^2.0.3"
   }
 }

@@ -1,0 +1,4 @@
+//On ping
+mosquitto_pub -m "{\"name\":\"ping\",\"parameters\":[{\"name\":\"google.com\",\"value\":\"\"}],\"time\":{\"minute\":\"*/1\"},\"duration\":5,\"probe\":\"5cbde351ece14e746955bac5\"}" -t probe/5cbde351ece14e746955bac5/command/5cd1b78b4b9fc01d91eb8208 -d
+//Off ping
+mosquitto_pub -m "Off" -t probe/5cbde351ece14e746955bac5/command/123123123 -d
