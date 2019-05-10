@@ -1,0 +1,11 @@
+{
+  "name": "probe-api-network-monitor",
+  "version": "1.0.0",
+  "description": "API alojada en las sondas que recoge información del tráfico en la red",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Carlos López Sanchís",
+  "license": "ISC"
+}
