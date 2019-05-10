@@ -10,6 +10,7 @@
   "author": "Carlos López Sanchís",
   "license": "ISC",
   "dependencies": {
+    "dotenv": "^8.0.0",
     "mqtt": "^2.18.8"
   }
 }
