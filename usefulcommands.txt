@@ -2,3 +2,5 @@
 mosquitto_pub -m "{\"active\":1,\"name\":\"ping\",\"parameters\":[{\"name\":\"google.com\",\"value\":\"\"}],\"time\":{\"minute\":\"*/1\"},\"duration\":5,\"probe\":\"5cbde351ece14e746955bac5\"}" -t probe/5cbde351ece14e746955bac5/command/5cd1b78b4b9fc01d91eb8208 -d
 //Off ping
 mosquitto_pub -m "{\"active\":0,\"name\":\"ping\",\"parameters\":[{\"name\":\"google.com\",\"value\":\"\"}],\"time\":{\"minute\":\"*/1\"},\"duration\":5,\"probe\":\"5cbde351ece14e746955bac5\"}" -t probe/5cbde351ece14e746955bac5/command/5cd1b78b4b9fc01d91eb8208 -d
+//Send result
+mosquitto_pub -m "{\"_id\": \"5ccb38539c38e70f54eee980\",\"command\": \"5cc96b4c0cf84e40c48e813b\",\"type\": \"ping\",\"results\": {\"min\": \"11.874\",\"avg\": \"28.126\",\"max\": \"78.048\",\"mdev\": \"25.466\",\"duration\": 5}}" -t probe/5cbde351ece14e746955bac5/command/5cd1b78b4b9fc01d91eb8208 -d

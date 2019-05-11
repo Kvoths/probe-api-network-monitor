@@ -1,6 +1,7 @@
 const mongoose = require('mongoose');
 const cron = require('node-cron');
 const { spawn } = require('child_process');
+const mqttController = require('../mqtt/mqttController');
 let cronJobs = {};
 require('./command');
 require('./result');
@@ -21,7 +22,6 @@ exports.processMessage = function (topic, message) {
                 cronJobs[splitedTopic[3]].destroy();
                 console.log('Deleted.');
             } else if (command.active) {
-                console.log('saludos');
                 createCron(command);
             }
             //Set command
@@ -40,7 +40,7 @@ getResults = function (req, res, next) {
 }
 
 createCron = function (command) {
-    console.log('hola');
+    console.log('Monitorizando...');
     
     let minute = (command.time.minute) ? command.time.minute : '*';
     let hour = (command.time.hour) ? command.time.hour : '*';
@@ -145,16 +145,15 @@ saveCommandOutput = function (command_id, command_name, output, duration) {
 
 saveResult = function (command_id, type, values) {
     var result = new Result();
-    console.log(command_id);
-    console.log(command_id);
     result.command = command_id;
     result.type = type;
     result.results = values;
-    result.save( function(err) {
+    result.save( function(err, result) {
         if (err) {
             console.log(err);
         }
-
+        let message = JSON.stringify(result);
+        mqttController.sendMessage('master', message);
         return true;
     });
 }
