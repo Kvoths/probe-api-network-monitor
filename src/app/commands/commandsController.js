@@ -118,8 +118,17 @@ saveCommandOutput = function (command_id, command_name, output, duration) {
                     "mdev": values[3],
                     "duration": duration
                 };
-                this.saveResult(command_id, 'ping', values);
+            } else {
+                values = {
+                    "min": 0,
+                    "avg": 0,
+                    "max": 0,
+                    "mdev": 0,
+                    "duration": duration
+                };
             }
+
+            this.saveResult(command_id, 'ping', values);
             break;
         case 'tcpdump':
             expr = ' packets captured';
@@ -134,9 +143,16 @@ saveCommandOutput = function (command_id, command_name, output, duration) {
                     "duration": duration,
                     "num_packets_per_secon": (num_packets / duration)
                 };
-                this.saveResult(command_id, 'tcpdump', values);
+                
+            } else {
+                values = {
+                    "num_packets": 0,
+                    "duration": duration,
+                    "num_packets_per_secon": 0
+                };
             }
-
+            
+            this.saveResult(command_id, 'tcpdump', values);
             break;
         default:
             console.log(`The command ${command_name} is not yet implemented.`);
