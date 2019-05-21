@@ -154,6 +154,64 @@ saveCommandOutput = function (command_id, command_name, output, duration) {
             
             this.saveResult(command_id, 'tcpdump', values);
             break;
+        case 'iperf':
+            expr = 'Bandwidth';
+            dividedString = output.split(expr);
+
+            value = {
+                "interval": {
+                    value: 0,
+                    units: ''
+                },
+                "transfer": {
+                    value: 0,
+                    units: ''
+
+                },
+                "bandwidth": {
+                    value: 0,
+                    units: '' 
+                }    
+            }
+
+            if (typeof dividedString[1] !== 'undefined') {
+                expr = '  ';
+                dividedString = dividedString[1].split(expr);
+
+                if (dividedString[2] !== undefined && dividedString[3] !== undefined && dividedString[4] !== undefined) {
+                    for (let i = 2; i < 5; i++) {
+                        let auxDividedString = dividedString[i].split(' ');
+                        let aux_value;
+                        if (i == 2) {
+                            aux_value = {
+                                value: auxDividedString[0] + auxDividedString[1],
+                                units: auxDividedString[2]
+                            };
+                        } else {
+                            aux_value = {
+                                value: auxDividedString[0],
+                                units: auxDividedString[1]
+                            };
+                        }
+
+                        switch (i) {
+                        case 2:
+                            value.interval = aux_value;
+                            break;
+                        case 3:
+                            value.transfer = aux_value;
+                            break;
+                        case 4:
+                            value.bandwidth = aux_value;
+                            break;
+                        }
+                    }
+                }
+
+            }
+
+            this.saveResult(command_id, 'iperf', value);
+            break;
         default:
             console.log(`The command ${command_name} is not yet implemented.`);
     }
