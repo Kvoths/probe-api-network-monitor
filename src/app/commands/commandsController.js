@@ -17,7 +17,10 @@ exports.processMessage = function (topic, message) {
             console.log(command.active);
             command._id = splitedTopic[3];
             //Destroy command
-            if (!command.active && cronJobs[splitedTopic[3]] !== undefined) {
+            if (command._id == 'iperfServer') {
+                console.log('Activando servidor para iperf');
+                this.execAuto(command);
+            } else if (!command.active && cronJobs[splitedTopic[3]] !== undefined) {
                 console.log('Deleting: ' + splitedTopic[3]);
                 cronJobs[splitedTopic[3]].destroy();
                 console.log('Deleted.');
@@ -66,8 +69,29 @@ execAuto = function (command) {
             commandParams.push(parameter['value']);
     }
     
-    commandSpawn = spawn(command.name, commandParams);
-    this.getCommandOutput(commandSpawn, command.duration).then( output => saveCommandOutput (command._id, command.name, output, command.duration));
+    if (command.name  === 'iperf' && command.server !== undefined && command.server !== null && command.server !== "") {
+        let message = {
+            name: 'iperf',
+            parameters: [{
+                name: -s
+            }],
+            duration: 60,
+            active = true
+        };
+
+        mqttController.sendMessage('probe/' + command.server + '/command/iperfServer', message);
+        await sleep(2000);
+        commandSpawn = spawn(command.name, commandParams);
+        this.getCommandOutput(commandSpawn, command.duration).then( output => saveCommandOutput (command._id, command.name, output, command.duration));
+    } else {
+        commandSpawn = spawn(command.name, commandParams);
+        this.getCommandOutput(commandSpawn, command.duration).then( output => {
+            if (command._id !== 'iperfServer') 
+            {
+                saveCommandOutput (command._id, command.name, output, command.duration)
+            }
+        });
+    }
 }
 
 getCommandOutput = function (commandSpawn, duration) {
