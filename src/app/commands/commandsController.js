@@ -57,7 +57,7 @@ createCron = function (command) {
     });
 }
 
-execAuto = function (command) {
+execAuto = async function (command) {
     var commandParams = [];
 
     for (var i = 0; i < command.parameters.length; i++)
@@ -76,7 +76,7 @@ execAuto = function (command) {
                 name: -s
             }],
             duration: 60,
-            active = true
+            active: true
         };
 
         mqttController.sendMessage('probe/' + command.server + '/command/iperfServer', message);
