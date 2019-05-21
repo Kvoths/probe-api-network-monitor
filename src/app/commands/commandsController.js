@@ -18,8 +18,14 @@ exports.processMessage = function (topic, message) {
             command._id = splitedTopic[3];
             //Destroy command
             if (command._id == 'iperfServer') {
-                console.log('Activando servidor para iperf');
-                this.execAuto(command);
+        
+                if (!command.active && cronJobs[splitedTopic[3]] !== undefined) {
+                    console.log('Apagando servidor para iperf');
+                    cronJobs[splitedTopic[3]].kill('SIGINT');
+                } else if (command.active) {
+                    console.log('Activando servidor para iperf');
+                    execAuto(command);
+                }
             } else if (!command.active && cronJobs[splitedTopic[3]] !== undefined) {
                 console.log('Deleting: ' + splitedTopic[3]);
                 cronJobs[splitedTopic[3]].destroy();
@@ -85,6 +91,9 @@ execAuto = async function (command) {
         this.getCommandOutput(commandSpawn, command.duration).then( output => saveCommandOutput (command._id, command.name, output, command.duration));
     } else {
         commandSpawn = spawn(command.name, commandParams);
+        if (command._id === 'iperfServer') {
+            cronJobs[command._id] = commandSpawn;
+        }
         this.getCommandOutput(commandSpawn, command.duration).then( output => {
             if (command._id !== 'iperfServer') 
             {
