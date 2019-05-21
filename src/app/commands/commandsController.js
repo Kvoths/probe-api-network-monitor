@@ -73,22 +73,28 @@ execAuto = async function (command) {
         let message = {
             name: 'iperf',
             parameters: [{
-                name: -s
+                name: '-s'
             }],
             duration: 60,
             active: true
         };
 
+        message = JSON.stringify(message);
+
         mqttController.sendMessage('probe/' + command.server + '/command/iperfServer', message);
-        await sleep(2000);
-        commandSpawn = spawn(command.name, commandParams);
-        this.getCommandOutput(commandSpawn, command.duration).then( output => saveCommandOutput (command._id, command.name, output, command.duration));
+        console.log('Enviando mensaje de encender al servidor iperf');
+
+        setTimeout( () => {
+            commandSpawn = spawn(command.name, commandParams);
+            this.getCommandOutput(commandSpawn, command.duration).then( output => saveCommandOutput (command._id, command.name, output, command.duration, command.server));
+        }, 3000);
+        
     } else {
         commandSpawn = spawn(command.name, commandParams);
         this.getCommandOutput(commandSpawn, command.duration).then( output => {
             if (command._id !== 'iperfServer') 
             {
-                saveCommandOutput (command._id, command.name, output, command.duration)
+                saveCommandOutput (command._id, command.name, output, command.duration, undefined)
             }
         });
     }
@@ -125,7 +131,7 @@ getCommandOutput = function (commandSpawn, duration) {
     });
 }
 
-saveCommandOutput = function (command_id, command_name, output, duration) {
+saveCommandOutput = function (command_id, command_name, output, duration, server) {
     let expr, dividedString, values;
     switch (command_name) {
         case 'ping':
@@ -179,6 +185,20 @@ saveCommandOutput = function (command_id, command_name, output, duration) {
             this.saveResult(command_id, 'tcpdump', values);
             break;
         case 'iperf':
+            let message = {
+                name: 'iperf',
+                parameters: [{
+                    name: '-s'
+                }],
+                duration: 60,
+                active: false
+            };
+    
+            message = JSON.stringify(message);
+    
+            mqttController.sendMessage('probe/' + server + '/command/iperfServer', message);
+            console.log('Enviando mensaje de apagar al servidor iperf');
+
             expr = 'Bandwidth';
             dividedString = output.split(expr);
 
