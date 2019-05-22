@@ -15,10 +15,9 @@ exports.processMessage = function (topic, message) {
         if (splitedTopic[2] == 'command' && splitedTopic[3] !== undefined) {
             let command = JSON.parse(message);
             console.log(command.active);
-            command._id = splitedTopic[3];
+            command._id = (command._id !== undefined && command._id !== null ) ? command._id : splitedTopic[3];
             //Destroy command
-            if (command._id == 'iperfServer') {
-        
+            if (splitedTopic[3] == 'iperfServer') {
                 if (!command.active && cronJobs[splitedTopic[3]] !== undefined) {
                     console.log('Apagando servidor para iperf');
                     cronJobs[splitedTopic[3]].kill('SIGINT');
@@ -26,6 +25,8 @@ exports.processMessage = function (topic, message) {
                     console.log('Activando servidor para iperf');
                     execAuto(command);
                 }
+            } else if (splitedTopic[3] == 'iperfClient') {
+                execAuto(command);
             } else if (!command.active && cronJobs[splitedTopic[3]] !== undefined) {
                 console.log('Deleting: ' + splitedTopic[3]);
                 cronJobs[splitedTopic[3]].destroy();
@@ -41,12 +42,12 @@ exports.processMessage = function (topic, message) {
     }
 }
 
-getResults = function (req, res, next) {
+/*getResults = function (req, res, next) {
     Result.find( function ( err, results ) {
         res.status(200);
         res.json(results);
     });
-}
+}*/
 
 createCron = function (command) {
     console.log('Monitorizando...');
@@ -82,7 +83,8 @@ execAuto = async function (command) {
                 name: '-s'
             }],
             duration: 60,
-            active: true
+            active: true,
+            returnCommand: command
         };
 
         message = JSON.stringify(message);
@@ -275,13 +277,14 @@ saveResult = function (command_id, type, values) {
     result.command = command_id;
     result.type = type;
     result.results = values;
-    result.save( function(err, result) {
+    let message = JSON.stringify(result);
+    mqttController.sendMessage('master', message);
+
+    /*result.save( function(err, result) {
         if (err) {
             console.log(err);
         }
-        let message = JSON.stringify(result);
-        mqttController.sendMessage('master', message);
         return true;
-    });
+    });*/
 }
 
