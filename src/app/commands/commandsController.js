@@ -257,7 +257,19 @@ saveCommandOutput = function (command_id, command_name, output, duration, server
                             value.transfer = aux_value;
                             break;
                         case 4:
+                            if (auxDividedString[1] == 'Gbits/sec\n') {
+                                auxDividedString[1] = 'Mbits/sec';
+                                auxDividedString[0] = auxDividedString[0] * 1000;
+                            }
+
+                            aux_value = {
+                                value: auxDividedString[0],
+                                units: auxDividedString[1]
+                            };
+                            
                             value.bandwidth = aux_value;
+                            
+
                             break;
                         }
                     }
